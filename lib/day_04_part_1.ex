@@ -12,136 +12,138 @@ defmodule Day04Part1 do
     doit(content)
   end
 
-  def elem_at(matrix, x, y) do
+  defp elem_at(matrix, x, y) do
     matrix
     |> at(y)
     |> at(x)
   end
 
-  def xmas_vertical(idx, matrix_as_single_line) do
-    # cond do
-    #   elem_at(matrix, 0, 0) == ?X &&
-    #     elem_at(matrix, 0, 1) == ?M &&
-    #     elem_at(matrix, 0, 2) == ?A &&
-    #       elem_at(matrix, 0, 3) == ?S ->
-    #     1
+  def xmas_vertical(matrix, x, y) do
+    try do
+      cond do
+        elem_at(matrix, x, y) == ?X &&
+          elem_at(matrix, x, y + 1) == ?M &&
+          elem_at(matrix, x, y + 2) == ?A &&
+            elem_at(matrix, x, y + 3) == ?S ->
+          1
 
-    #   elem_at(matrix, 0, 0) == ?S &&
-    #     elem_at(matrix, 0, 1) == ?A &&
-    #     elem_at(matrix, 0, 2) == ?M &&
-    #       elem_at(matrix, 0, 3) == ?X ->
-    #     1
+        elem_at(matrix, x, y) == ?S &&
+          elem_at(matrix, x, y + 1) == ?A &&
+          elem_at(matrix, x, y + 2) == ?M &&
+            elem_at(matrix, x, y + 3) == ?X ->
+          1
 
-    #   true ->
-    #     0
-    # end
-    1
+        true ->
+          0
+      end
+    rescue
+      _ -> 0
+    end
   end
 
-  def xmas_horizontal(idx, matrix_as_single_line) do
-    # cond do
-    #   elem_at(matrix, 0, 0) == ?X &&
-    #     elem_at(matrix, 1, 0) == ?M &&
-    #     elem_at(matrix, 2, 0) == ?A &&
-    #       elem_at(matrix, 3, 0) == ?S ->
-    #     1
+  def xmas_horizontal(matrix, x, y) do
+    try do
+      found =
+        cond do
+          elem_at(matrix, x, y) == ?X &&
+            elem_at(matrix, x + 1, y) == ?M &&
+            elem_at(matrix, x + 2, y) == ?A &&
+              elem_at(matrix, x + 3, y) == ?S ->
+            1
 
-    #   elem_at(matrix, 0, 0) == ?S &&
-    #     elem_at(matrix, 1, 0) == ?A &&
-    #     elem_at(matrix, 2, 0) == ?M &&
-    #       elem_at(matrix, 3, 0) == ?X ->
-    #     1
+          elem_at(matrix, x, y) == ?S &&
+            elem_at(matrix, x + 1, y) == ?A &&
+            elem_at(matrix, x + 2, y) == ?M &&
+              elem_at(matrix, x + 3, y) == ?X ->
+            1
 
-    #   true ->
-    #     0
-    # end
-    1
+          true ->
+            0
+        end
+
+      found
+    rescue
+      _ -> 0
+    end
   end
 
-  def xmas_diagonal(idx, matrix_as_single_line) do
-    # cond do
-    #   elem_at(matrix, 0, 0) == ?X &&
-    #     elem_at(matrix, 1, 1) == ?M &&
-    #     elem_at(matrix, 2, 2) == ?A &&
-    #       elem_at(matrix, 3, 3) == ?S ->
-    #     1
+  def xmas_diagonal_down(matrix, x, y) do
+    try do
+      cond do
+        elem_at(matrix, x, y) == ?X &&
+          elem_at(matrix, x + 1, y + 1) == ?M &&
+          elem_at(matrix, x + 2, y + 2) == ?A &&
+            elem_at(matrix, x + 3, y + 3) == ?S ->
+          1
 
-    #   elem_at(matrix, 0, 0) == ?S &&
-    #     elem_at(matrix, 1, 1) == ?A &&
-    #     elem_at(matrix, 2, 2) == ?M &&
-    #       elem_at(matrix, 3, 3) == ?X ->
-    #     1
+        elem_at(matrix, x, y) == ?S &&
+          elem_at(matrix, x + 1, y + 1) == ?A &&
+          elem_at(matrix, x + 2, y + 2) == ?M &&
+            elem_at(matrix, x + 3, y + 3) == ?X ->
+          1
 
-    #   true ->
-    #     0
-    # end
-    1
+        true ->
+          0
+      end
+    rescue
+      _ -> 0
+    end
   end
 
-  # def how_many_xmas(matrix) do
-  #   cond do
-  #     length(matrix) < 3 && length(at(matrix, 0)) < 3 ->
-  #       0
+  def xmas_diagonal_up(matrix, x, y) do
+    try do
+      cond do
+        elem_at(matrix, x, y) == ?X &&
+          elem_at(matrix, x + 1, y - 1) == ?M &&
+          elem_at(matrix, x + 2, y - 2) == ?A &&
+            elem_at(matrix, x + 3, y - 3) == ?S ->
+          1
 
-  #     length(matrix) >= 3 && length(at(matrix, 0)) >= 3 ->
-  #       xmas_horizontal(matrix) + xmas_vertical(matrix) + xmas_diagonal(matrix)
+        elem_at(matrix, x, y) == ?S &&
+          elem_at(matrix, x + 1, y - 1) == ?A &&
+          elem_at(matrix, x + 2, y - 2) == ?M &&
+            elem_at(matrix, x + 3, y - 3) == ?X ->
+          1
 
-  #     length(at(matrix, 0)) < 3 ->
-  #       xmas_horizontal(matrix)
-
-  #     length(matrix) < 3 ->
-  #       xmas_vertical(matrix)
-  #   end
-  # end
-
-  def is_on_last_columns(idx, width) do
-    rem(idx, width) >= width - 3
+        true ->
+          0
+      end
+    rescue
+      _ -> 0
+    end
   end
 
-  def is_on_last_rows(idx, width, height) do
-    idx > width * (height - 3)
-  end
+  def how_many_xmas(matrix, width) do
+    matrix
+    |> join()
+    |> String.to_charlist()
+    |> reduce(%{idx: 0, x: 0, y: 0, xmas: 0}, fn _el, acc ->
+      x = rem(acc.idx, width)
+      y = if acc.x == width - 1, do: acc.y + 1, else: acc.y
 
-  def has_no_char_left(idx, width, height) do
-    is_on_last_columns(idx, width) && is_on_last_rows(idx, width, height)
+      xmas =
+        xmas_vertical(matrix, x, y) +
+          xmas_horizontal(matrix, x, y) +
+          xmas_diagonal_down(matrix, x, y) +
+          xmas_diagonal_up(matrix, x, y)
+
+      %{idx: acc.idx + 1, x: x, y: y, xmas: acc.xmas + xmas}
+    end)
   end
 
   def doit(content) do
-    splitted = String.split(content, "\n")
+    matrix =
+      String.split(content, "\n")
+      |> map(&String.to_charlist/1)
 
     # compute width and height before merging everything
-    width = splitted |> at(0) |> String.length()
-    height = length(splitted)
+    width =
+      matrix
+      |> at(0)
+      |> length()
 
-    matrix_as_single_line = content |> String.replace("\n", "") |> String.to_charlist()
-    #matrix_length = length(matrix_as_single_line)
+    %{xmas: xmas} = how_many_xmas(matrix, width)
 
-    matrix_as_single_line
-    |> reduce(%{idx: 0, xmas: 0}, fn _c, acc ->
-      %{idx: idx, xmas: xmas} = acc
-
-      found_xmas =
-        cond do
-          has_no_char_left(acc.idx, width, height) ->
-            0
-
-          is_on_last_columns(idx, width) ->
-            xmas_vertical(idx, matrix_as_single_line)
-
-          is_on_last_rows(idx, width, height) ->
-            xmas_horizontal(idx, matrix_as_single_line)
-
-          true ->
-            xmas_vertical(idx, matrix_as_single_line)
-            +xmas_horizontal(idx, matrix_as_single_line)
-            +xmas_diagonal(idx, matrix_as_single_line)
-        end
-
-      %{idx: idx + 1, xmas: xmas + found_xmas}
-    end)
-    |> IO.inspect()
-    # |> filter(fn c -> at(c, 0) == ?X end)
-
-    matrix_as_single_line
+    xmas
   end
 end
