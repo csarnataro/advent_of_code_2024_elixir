@@ -20,8 +20,8 @@ defmodule Day05Part2 do
   def pairs([_]), do: []
 
   def pairs(page_numbers) do
-    for {x, index1} <- Enum.with_index(page_numbers),
-        {y, index2} <- Enum.with_index(page_numbers) do
+    for {x, index1} <- with_index(page_numbers),
+        {y, index2} <- with_index(page_numbers) do
       if index1 < index2, do: y <> "|" <> x, else: nil
     end
     |> filter(fn v -> !is_nil(v) end)
